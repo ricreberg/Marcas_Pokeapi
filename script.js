@@ -65,7 +65,7 @@ window.addEventListener("DOMContentLoaded", function() {
         let urlShiny = data.sprites.front_shiny;
         let urlNormal = data.sprites.front_default;
 
-        // Si no tiene sprite shiny, intentamos usar el normal y viceversa para evitar errores
+        // Si no tiene sprite shiny, se  usa el normal y viceversa para evitar errores
         if (!urlShiny) urlShiny = urlNormal;
         if (!urlNormal) urlNormal = urlShiny;
 
@@ -77,11 +77,11 @@ window.addEventListener("DOMContentLoaded", function() {
         let altura = data.height / 10 + " m";
         let peso = data.weight / 10 + " kg";
 
-        // Guardamos los datos del Pokémon actual en las variables temporales
+        // Guardado de datos del Pokémon actual en las variables temporales
         currentPokemonName = data.name;
         currentPokemonImg = urlShiny;
 
-        // Limpiamos y rellenamos el select de juegos (Criterio: Manipulación DOM)
+        // Limpieza y rellneo del select de juegos 
         selectJuego.innerHTML = "";
         let arrayJuegos = [];
         
@@ -90,7 +90,7 @@ window.addEventListener("DOMContentLoaded", function() {
                 arrayJuegos.push(item.version.name.toUpperCase());
             }
         } else {
-            // PokeAPI no tiene game_indices para Gen 7+. Añadimos lista manual de juegos modernos.
+            // PokeAPI no tiene game_indices para Gen 7+. Se añade lista manual de juegos modernos.
             arrayJuegos = ["SUN", "MOON", "ULTRA-SUN", "ULTRA-MOON", "SWORD", "SHIELD", "BRILLIANT-DIAMOND", "SHINING-PEARL", "LEGENDS-ARCEUS", "SCARLET", "VIOLET"];
         }
 
@@ -101,13 +101,13 @@ window.addEventListener("DOMContentLoaded", function() {
             selectJuego.appendChild(opt);
         }
 
-        // Extraemos los tipos
+        // Extraccion de  los tipos
         let tipos = "";
         for (let item of data.types) {
             tipos += item.type.name.toUpperCase() + " ";
         }
 
-        // Extraemos TODAS las estadísticas base
+        // Extraccion de todas las estadísticas base
         let statsHtml = "<div style='margin-top: 1rem; margin-bottom: 1rem; text-align: left; padding: 0 1rem;'>";
         for (let stat of data.stats) {
             let width = stat.base_stat > 150 ? 100 : (stat.base_stat / 150) * 100; // Escalamos para que los grandes ocupen casi todo
@@ -122,7 +122,7 @@ window.addEventListener("DOMContentLoaded", function() {
         }
         statsHtml += "</div>";
 
-        // Renderizamos la info
+        // Renderizado de la info
         divInfo.innerHTML = "<p><strong>" + nombre + "</strong></p>" +
                             "<p><strong> Altura: " + altura + "</strong></p>" +
                             "<p><strong>Peso: " + peso + "</strong></p>" +
@@ -147,7 +147,7 @@ window.addEventListener("DOMContentLoaded", function() {
         });
         divInfo.appendChild(btnToggle);
 
-        // Crear el botón "¡Lo atrapé!" dinámicamente
+        // Crear el botón "¡Lo atrapé!" 
         let btnAtrapado = document.createElement("button");
         btnAtrapado.textContent = "¡Lo atrapé!";
         btnAtrapado.id = "btnAtrapado";
@@ -169,7 +169,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
     // Evento para enviar el formulario y guardar el Shiny
     formShiny.addEventListener("submit", function(event) {
-        event.preventDefault(); // Evitamos que la página se recargue (visto en Event)
+        event.preventDefault(); // Se evita que la página se recargue 
 
         let nuevoShiny = {
             nombre: currentPokemonName,
@@ -179,7 +179,7 @@ window.addEventListener("DOMContentLoaded", function() {
             juego: selectJuego.value
         };
 
-        // Añadimos al array y guardamos en LocalStorage
+        // Añadir al array y guardamos en LocalStorage
         misShinies.push(nuevoShiny);
         localStorage.setItem("misShinies", JSON.stringify(misShinies));
 
@@ -214,7 +214,7 @@ window.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        // Actualizamos el contador
+        // Actualizacion del contador
         contadorShinies.textContent = "Total registrados: " + listaFiltrada.length;
 
         if (listaFiltrada.length === 0) {
@@ -222,7 +222,7 @@ window.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // Recorremos el array filtrado usando un bucle for...of (visto en Bucles)
+        // Se recorre el array filtrado usando un bucle for...of 
         for (let shiny of listaFiltrada) {
             let tarjeta = document.createElement("div");
             tarjeta.className = "tarjetaShiny";
@@ -244,11 +244,11 @@ window.addEventListener("DOMContentLoaded", function() {
             btnBorrar.textContent = "Borrar";
             btnBorrar.className = "btnBorrar";
             btnBorrar.addEventListener("click", function() {
-                // Filtramos el array usando filter() (visto en métodos de arrays)
+                // Filtrar el array usando filter() 
                 misShinies = misShinies.filter(function(item) {
                     return item !== shiny;
                 });
-                // Guardamos en local storage y actualizamos la lista
+                // Guardar en local storage y actualizacion de la lista
                 localStorage.setItem("misShinies", JSON.stringify(misShinies));
                 actualizarLista();
             });
