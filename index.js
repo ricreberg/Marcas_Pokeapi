@@ -15,6 +15,8 @@ window.addEventListener("DOMContentLoaded", function() {
     let selectJuego = document.getElementById("juegoOrigen");
     let btnCancelar = document.getElementById("btnCancelar");
     let divListaShinies = document.getElementById("listaShinies");
+    let contadorShinies = document.getElementById("contadorShinies");
+    let filtroShinies = document.getElementById("filtroShinies");
 
     // Variables temporales para guardar los datos del Pokémon buscado actualmente
     let currentPokemonName = "";
@@ -60,15 +62,16 @@ window.addEventListener("DOMContentLoaded", function() {
     }
 
     function mostrarDatos(data) {
-        let urlImagen = data.sprites.front_shiny;
+        let urlShiny = data.sprites.front_shiny;
+        let urlNormal = data.sprites.front_default;
 
-        // Si no tiene sprite shiny, intentamos usar el default
-        if (!urlImagen) {
-            urlImagen = data.sprites.front_default;
-        }
+        // Si no tiene sprite shiny, intentamos usar el normal y viceversa para evitar errores
+        if (!urlShiny) urlShiny = urlNormal;
+        if (!urlNormal) urlNormal = urlShiny;
 
-        imgPokemon.src = urlImagen;
+        imgPokemon.src = urlShiny;
         imgPokemon.style.display = "inline";
+        imgPokemon.dataset.isShiny = "true";
 
         let nombre = data.name.toUpperCase();
         let altura = data.height / 10 + " m";
@@ -76,21 +79,25 @@ window.addEventListener("DOMContentLoaded", function() {
 
         // Guardamos los datos del Pokémon actual en las variables temporales
         currentPokemonName = data.name;
-        currentPokemonImg = urlImagen;
+        currentPokemonImg = urlShiny;
 
         // Limpiamos y rellenamos el select de juegos (Criterio: Manipulación DOM)
         selectJuego.innerHTML = "";
+        let arrayJuegos = [];
+        
         if (data.game_indices && data.game_indices.length > 0) {
             for (let item of data.game_indices) {
-                let opt = document.createElement("option");
-                opt.value = item.version.name;
-                opt.textContent = item.version.name.toUpperCase();
-                selectJuego.appendChild(opt);
+                arrayJuegos.push(item.version.name.toUpperCase());
             }
         } else {
+            // PokeAPI no tiene game_indices para Gen 7+. Añadimos lista manual de juegos modernos.
+            arrayJuegos = ["SUN", "MOON", "ULTRA-SUN", "ULTRA-MOON", "SWORD", "SHIELD", "BRILLIANT-DIAMOND", "SHINING-PEARL", "LEGENDS-ARCEUS", "SCARLET", "VIOLET"];
+        }
+
+        for (let juego of arrayJuegos) {
             let opt = document.createElement("option");
-            opt.value = "desconocido";
-            opt.textContent = "DESCONOCIDO / GEN ACTUAL";
+            opt.value = juego.toLowerCase();
+            opt.textContent = juego;
             selectJuego.appendChild(opt);
         }
 
@@ -100,13 +107,47 @@ window.addEventListener("DOMContentLoaded", function() {
             tipos += item.type.name.toUpperCase() + " ";
         }
 
-        // Renderizamos la info y añadimos dinámicamente el botón "¡Lo atrapé!"
+        // Extraemos TODAS las estadísticas base
+        let statsHtml = "<div style='margin-top: 1rem; margin-bottom: 1rem; text-align: left; padding: 0 1rem;'>";
+        for (let stat of data.stats) {
+            let width = stat.base_stat > 150 ? 100 : (stat.base_stat / 150) * 100; // Escalamos para que los grandes ocupen casi todo
+            let statName = stat.stat.name.toUpperCase();
+            if (statName === "SPECIAL-ATTACK") statName = "SP. ATK";
+            if (statName === "SPECIAL-DEFENSE") statName = "SP. DEF";
+
+            statsHtml += "<div class='stat-row'>";
+            statsHtml += "<span style='font-size: 0.8rem; font-weight: bold;'>" + statName + ": " + stat.base_stat + "</span>";
+            statsHtml += "<div class='stat-bar-bg'><div class='stat-bar-fill' style='width: " + width + "%;'></div></div>";
+            statsHtml += "</div>";
+        }
+        statsHtml += "</div>";
+
+        // Renderizamos la info
         divInfo.innerHTML = "<p><strong>" + nombre + "</strong></p>" +
                             "<p><strong> Altura: " + altura + "</strong></p>" +
                             "<p><strong>Peso: " + peso + "</strong></p>" +
-                            "<p><strong>Tipo(s): " + tipos + "</strong></p>";
+                            "<p><strong>Tipo(s): " + tipos + "</strong></p>" +
+                            statsHtml;
 
-        // Crear el botón dinámicamente (Manipulación del DOM, Eventos)
+        // Botón toggle Normal/Shiny
+        let btnToggle = document.createElement("button");
+        btnToggle.textContent = "Ver Normal";
+        btnToggle.style.display = "block";
+        btnToggle.style.margin = "0 auto 10px auto";
+        btnToggle.addEventListener("click", function() {
+            if (imgPokemon.dataset.isShiny === "true") {
+                imgPokemon.src = urlNormal;
+                imgPokemon.dataset.isShiny = "false";
+                btnToggle.textContent = "Ver Shiny";
+            } else {
+                imgPokemon.src = urlShiny;
+                imgPokemon.dataset.isShiny = "true";
+                btnToggle.textContent = "Ver Normal";
+            }
+        });
+        divInfo.appendChild(btnToggle);
+
+        // Crear el botón "¡Lo atrapé!" dinámicamente
         let btnAtrapado = document.createElement("button");
         btnAtrapado.textContent = "¡Lo atrapé!";
         btnAtrapado.id = "btnAtrapado";
@@ -156,17 +197,33 @@ window.addEventListener("DOMContentLoaded", function() {
         inputResets.value = "0";
     });
 
+    // Evento del buscador de shinies
+    filtroShinies.addEventListener("input", function() {
+        actualizarLista(this.value.toLowerCase());
+    });
+
     // Función para renderizar la lista de "Mis Shinies"
-    function actualizarLista() {
+    function actualizarLista(textoFiltro = "") {
         divListaShinies.innerHTML = ""; // Limpiamos la lista anterior
 
-        if (misShinies.length === 0) {
-            divListaShinies.innerHTML = "<p style='color: #777;'>Aún no has registrado ningún Shiny. ¡Buena suerte cazando!</p>";
+        // Aplicamos el filtro si hay texto
+        let listaFiltrada = misShinies;
+        if (textoFiltro !== "") {
+            listaFiltrada = misShinies.filter(function(shiny) {
+                return shiny.nombre.toLowerCase().includes(textoFiltro);
+            });
+        }
+
+        // Actualizamos el contador
+        contadorShinies.textContent = "Total registrados: " + listaFiltrada.length;
+
+        if (listaFiltrada.length === 0) {
+            divListaShinies.innerHTML = "<p style='color: #777;'>No hay Shinies que mostrar.</p>";
             return;
         }
 
-        // Recorremos el array usando un bucle for...of (visto en Bucles)
-        for (let shiny of misShinies) {
+        // Recorremos el array filtrado usando un bucle for...of (visto en Bucles)
+        for (let shiny of listaFiltrada) {
             let tarjeta = document.createElement("div");
             tarjeta.className = "tarjetaShiny";
 

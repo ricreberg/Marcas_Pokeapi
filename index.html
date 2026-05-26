@@ -4,50 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokeAPI demo</title>
+    <title>Shinydex Pokeapi</title>
     <link rel="stylesheet" href="index.css">
     <script src="index.js"></script>
 </head>
 
 <body>
-    <h1>Busca un Pokemon</h1>
+    <header>
+        <h1>Shinydex Pokeapi</h1>
+        <p style="font-size: 0.9rem; color: #555; margin-bottom: 1rem;">
+            <strong>IDs:</strong> 1 - 1025 (Formas Base) | 10001+ (Formas Alternativas)
+        </p>
+    </header>
 
-    <p style="font-size: 0.9rem; color: #555; margin-bottom: 1rem;">
-        <strong>IDs:</strong> 1 - 1025 (Formas Base) | 10001+ (Formas Alternativas)
-    </p>
+    <main>
+        <input type="text" id="numeroPokemon" placeholder="Ej: 25 o pikachu">
+        <button id="btnPedir">Mostrar Pokemon</button>
+        
+        <div id="cajaPokemon">
+            <img id="imagenPokemon" alt="Imagen del Pokemon" style="display: none;">
+            <div id="infoPokemon"></div>
+        </div>
 
-    <input type="text" id="numeroPokemon" placeholder="Ej: 25 o pikachu">
-    <button id="btnPedir">Mostrar Pokemon</button>
-    <div id="cajaPokemon">
+        <!-- Formulario para registrar Shiny (oculto por defecto) -->
+        <div id="formularioRegistro" style="display: none;">
+            <h3>Registrar en Shinydex</h3>
+            <p id="registroNombrePokemon"></p>
+            <form id="formShiny">
+                <label for="fechaCaptura">Fecha de captura:</label><br>
+                <input type="date" id="fechaCaptura" required><br>
 
-        <img id="imagenPokemon" alt="Imagen del Pokemon" style="display: none;">
-        <div id="infoPokemon"></div>
+                <label for="resets">Intentos/Soft Resets:</label><br>
+                <input type="number" id="resets" min="0" value="0"><br>
 
-    </div>
+                <label for="juegoOrigen">Juego de origen:</label><br>
+                <select id="juegoOrigen" required></select><br>
 
-    <!-- Formulario para registrar Shiny (oculto por defecto) -->
-    <div id="formularioRegistro" style="display: none;">
-        <h3>Registrar en Shinydex</h3>
-        <p id="registroNombrePokemon"></p>
-        <form id="formShiny">
-            <label for="fechaCaptura">Fecha de captura:</label><br>
-            <input type="date" id="fechaCaptura" required><br>
-
-            <label for="resets">Intentos/Soft Resets:</label><br>
-            <input type="number" id="resets" min="0" value="0"><br>
-
-            <label for="juegoOrigen">Juego de origen:</label><br>
-            <select id="juegoOrigen" required></select><br>
-
-            <button type="submit" id="btnGuardar">Guardar Shiny</button>
-            <button type="button" id="btnCancelar">Cancelar</button>
-        </form>
-    </div>
+                <button type="submit" id="btnGuardar">Guardar Shiny</button>
+                <button type="button" id="btnCancelar">Cancelar</button>
+            </form>
+        </div>
+    </main>
 
     <!-- Sección de Mis Shinies -->
-    <hr>
-    <h2>Mis Shinies Atrapados</h2>
-    <div id="listaShinies"></div>
+    <section id="seccionShinies">
+        <hr>
+        <h2>Mis Shinies Atrapados</h2>
+        <p id="contadorShinies" style="font-weight: bold; margin-bottom: 0.5rem; color: #3b4cca;">Total registrados: 0</p>
+        <input type="text" id="filtroShinies" placeholder="Buscar Pokémon shiny..." style="margin-bottom: 1.5rem; width: 250px;">
+        <div id="listaShinies"></div>
+    </section>
 
     <hr>
     <footer style="margin-top: 3rem; font-size: 0.8rem; color: #777;">
