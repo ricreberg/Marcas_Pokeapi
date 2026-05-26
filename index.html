@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,18 +8,52 @@
     <link rel="stylesheet" href="index.css">
     <script src="index.js"></script>
 </head>
+
 <body>
     <h1>Busca un Pokemon</h1>
+
+    <p style="font-size: 0.9rem; color: #555; margin-bottom: 1rem;">
+        <strong>IDs:</strong> 1 - 1025 (Formas Base) | 10001+ (Formas Alternativas)
+    </p>
 
     <input type="text" id="numeroPokemon" placeholder="Ej: 25 o pikachu">
     <button id="btnPedir">Mostrar Pokemon</button>
     <div id="cajaPokemon">
-        
-        <img id="imagenPokemon" alt="Imagen del Pokemon">
+
+        <img id="imagenPokemon" alt="Imagen del Pokemon" style="display: none;">
         <div id="infoPokemon"></div>
 
     </div>
 
+    <!-- Formulario para registrar Shiny (oculto por defecto) -->
+    <div id="formularioRegistro" style="display: none;">
+        <h3>Registrar en Shinydex</h3>
+        <p id="registroNombrePokemon"></p>
+        <form id="formShiny">
+            <label for="fechaCaptura">Fecha de captura:</label><br>
+            <input type="date" id="fechaCaptura" required><br>
 
+            <label for="resets">Intentos/Soft Resets:</label><br>
+            <input type="number" id="resets" min="0" value="0"><br>
+
+            <label for="juegoOrigen">Juego de origen:</label><br>
+            <select id="juegoOrigen" required></select><br>
+
+            <button type="submit" id="btnGuardar">Guardar Shiny</button>
+            <button type="button" id="btnCancelar">Cancelar</button>
+        </form>
+    </div>
+
+    <!-- Sección de Mis Shinies -->
+    <hr>
+    <h2>Mis Shinies Atrapados</h2>
+    <div id="listaShinies"></div>
+
+    <hr>
+    <footer style="margin-top: 3rem; font-size: 0.8rem; color: #777;">
+        Proyecto desarrollado usando datos públicos de la <a href="https://pokeapi.co/" target="_blank"
+            style="color: #3b4cca; text-decoration: none; font-weight: bold;">PokeAPI</a>.
+    </footer>
 </body>
+
 </html>

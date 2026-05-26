@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "Marcas_Pokeapi",
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Marcas_Pokeapi"
+	}
+}
